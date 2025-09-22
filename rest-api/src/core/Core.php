@@ -22,13 +22,14 @@ class Core{
     }
 
     private function getController($url){
-        if(!empty($url)){
+        $url_rep = str_replace(['/api/', '/api'], '/', $url);
+        if(str_contains($url, "/api")){
            foreach($this->routes as $path => $sepController){
-                if($path == $this->urlMethod){
+                if($path === $this->urlMethod){
                     foreach($sepController as $key => $value){
                         $pattern = '#^'.preg_replace('/{id}/', '(\w+)', $key).'$#';
 
-                        if(preg_match($pattern, $url, $matches)){
+                        if(preg_match($pattern, $url_rep, $matches)){
                             $this->getParams($matches);
                             [$this->controller, $this->method] = explode('@', $value);
                             break;

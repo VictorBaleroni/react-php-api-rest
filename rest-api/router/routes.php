@@ -1,5 +1,7 @@
 <?php
 
+// ! /api/user
+
 $routes = [
     "GET" => [
         "/" => "HomeController@index",
@@ -7,5 +9,8 @@ $routes = [
     ],
     "POST" => [
         "/post" => "UserController@post"
+    ],
+    "PUT" => [
+        "/put/{id}" => "UserController@put"
     ]
 ];
