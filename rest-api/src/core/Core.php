@@ -5,57 +5,48 @@ namespace Src\core;
 use Src\http\Url\Uri;
 
 class Core{
-    private $routes;
-    private $uri;
-    private $urlMethod;
-    protected $controller = '';
-    protected $method = '';
-    protected $params = [];
+    private $routes = [];
+    private $groupMiddlewares = [];
+    private $groupPrefix = '';
 
-    public function __construct($routes){
-        $this->routes = $routes;
-        $this->uri = Uri::uri();
-        $this->urlMethod = Uri::getMethod();
-        $this->getController($this->uri);
-
-        call_user_func_array([$this->controller, $this->method], $this->params);
-    }
-
-    private function getController($url){
-        $url_rep = str_replace(['/api/', '/api'], '/', $url);
-        if(str_contains($url, "/api")){
-           foreach($this->routes as $path => $sepController){
-                if($path === $this->urlMethod){
-                    foreach($sepController as $key => $value){
-                        $pattern = '#^'.preg_replace('/{id}/', '(\w+)', $key).'$#';
-
-                        if(preg_match($pattern, $url_rep, $matches)){
-                            $this->getParams($matches);
-                            [$this->controller, $this->method] = explode('@', $value);
-                            break;
-                        }
-                    }
-                }
-           }
-           $controllerPath = '../Src/Controllers/' . $this->controller . '.php';
-
-            if(file_exists($controllerPath)){
-                require $controllerPath;
-                
-                if(class_exists($this->controller)){
-                    $this->controller = new $this->controller();
-                }else{
-                    throw new \Exception("O Controller {$this->controller} não encontrado.");    
-                }
-            }else{
-                throw new \Exception("Arquivo não encontrado.");
-            }
+    public function globalMiddlewares(array $globalMiddlewares){
+        foreach($globalMiddlewares as $middlewares){
+            $middleware = new $middlewares();
+            $middleware->handle();
         }
     }
 
-    private function getParams($params){
-        if(count($params) > 1){
-            $this->params = array_slice($params, 1);
-        }
+    public function group(string $prefix, callable $callback, array $middlewares =[]){
+        $prevPrefixs = $this->groupPrefix;
+        $prevMiddlewares = $this->groupMiddlewares;
+
+        $this->groupPrefix .= $prefix;
+        $this->groupMiddlewares = array_merge($this->groupMiddlewares, $middlewares);
+
+        $callback($this);
+
+        $this->groupPrefix = $prevPrefixs;
+        $this->groupMiddlewares = $prevMiddlewares;
+    }
+
+    public function get(){
+    }
+    
+    public function post(){}
+
+    public function put(){}
+    
+    public function delete(){}
+
+    private function addRoute($method, $path, $handler, $middlewares){
+        $fullPath = $this->groupPrefix . $path;
+        $allMiddlewares = array_merge($this->groupMiddlewares, $middlewares);
+        
+        $this->routes[] = [
+            'method' => $method,
+            'path' => $fullPath,
+            'handler' => $handler,
+            'middlewares' => $allMiddlewares
+        ];
     }
 }

@@ -1,16 +1,10 @@
 <?php
 
-// ! /api/user
+use Src\core\Core;
+use Src\Middlewares\CorsMiddleware;
 
-$routes = [
-    "GET" => [
-        "/" => "HomeController@index",
-        "/user" => "UserController@get"
-    ],
-    "POST" => [
-        "/post" => "UserController@post"
-    ],
-    "PUT" => [
-        "/put/{id}" => "UserController@put"
-    ]
-];
+$core = new Core();
+
+$core->globalMiddlewares([CorsMiddleware::class]);
+
+$core->get();

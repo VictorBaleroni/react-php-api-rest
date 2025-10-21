@@ -3,15 +3,19 @@
 use Src\core\Controller;
 
 class UserController extends Controller{
-    public function get(){
-        echo 'get';
+    public function get($id = null){
+        
     }
 
     public function post(){
-        echo 'post';
+
     }
     
-    public function put($id){
-        echo $id;
+    public function put($id = null){
+
+    }
+
+    public function delete($id = null){
+        
     }
 }
