@@ -4,7 +4,6 @@ namespace Src\core;
 
 use Src\http\Request;
 use Src\http\Response;
-use Src\http\Url\Uri;
 
 class Core{
     private $routes = [];
@@ -31,23 +30,23 @@ class Core{
         $this->groupMiddlewares = $prevMiddlewares;
     }
 
-    public function get(string $path, string $handler, array $middlewares = []){
+    public function get(string $path, string|callable $handler, array $middlewares = []){
         $this->addRoute('GET', $path, $handler, $middlewares);
     }
     
-    public function post(string $path, string $handler, array $middlewares = []){
+    public function post(string $path, string|callable $handler, array $middlewares = []){
         $this->addRoute('POST', $path, $handler, $middlewares);
     }
 
-    public function put(string $path, string $handler, array $middlewares = []){
+    public function put(string $path, string|callable $handler, array $middlewares = []){
         $this->addRoute('PUT', $path, $handler, $middlewares);
     }
     
-    public function delete(string $path, string $handler, array $middlewares = []){
+    public function delete(string $path, string|callable $handler, array $middlewares = []){
         $this->addRoute('DELETE', $path, $handler, $middlewares);
     }
 
-    private function addRoute(string $method, string $path, string $handler, array $middlewares = []){
+    private function addRoute(string $method, string $path, string|callable $handler, array $middlewares = []){
         $fullPath = $this->groupPrefix . $path;
         $allMiddlewares = array_merge($this->groupMiddlewares, $middlewares);
         
@@ -80,11 +79,42 @@ class Core{
         
         $pattern = preg_replace('/\{[^}]+\}/', '([^/]+)', $route['path']);
         $pattern = "#^$pattern$#";
-        
+
         return preg_match($pattern, $path);
     }
 
     private function execRoute($route, $request, $response){
-        //
+        $middlewares = $route['middlewares'];
+
+        $pipeline = array_reduce(array_reverse($middlewares ?? []), 
+        function($next, $middlewareClass) use ($request, $response){
+            return function() use ($middlewareClass, $next, $request, $response){
+                $middleware = new $middlewareClass();
+                return $middleware->handle($next, $request);
+            };
+        }, function() use ($route, $request, $response){
+            return $this->execHandler($route['handler'], $request, $response);
+        });
+
+        return $pipeline();
+    }
+
+    private function execHandler($handler, $request, $response){
+        if(is_callable($handler)){
+            return $handler($request, $response);
+        }
+
+        if(is_string($handler)){
+            [$controller, $method] = explode('@', $handler);
+            $controllerClass = "../Src/controllers/$controller.php";
+            require $controllerClass;
+
+            if(class_exists($controller)){
+                $controllerInstance = new $controller();
+                return $controllerInstance->$method();
+            }
+        }
+
+        throw new \Exception("Handler inválido: " . print_r($handler, true));
     }
 }

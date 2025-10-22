@@ -12,7 +12,7 @@ $core = new Core();
 
 $core->globalMiddlewares([CorsMiddleware::class]);
 
-$core->get('/', HomeController::class);
+$core->get('/', 'HomeController@index');
 
 try{
     $core->dispatch($request, $response);
