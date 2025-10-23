@@ -9,6 +9,7 @@ class Core{
     private $routes = [];
     private $groupMiddlewares = [];
     private $groupPrefix = '';
+    private $params = [];
 
     public function globalMiddlewares(array $globalMiddlewares){
         foreach($globalMiddlewares as $middlewares){
@@ -76,11 +77,18 @@ class Core{
         if ($route['method'] !== $method) {
             return false;
         }
-        
+
         $pattern = preg_replace('/\{[^}]+\}/', '([^/]+)', $route['path']);
         $pattern = "#^$pattern$#";
-
-        return preg_match($pattern, $path);
+        
+        if(preg_match($pattern, $path, $matches)){
+            if(count($matches) > 1){
+                $this->params = array_slice($matches, 1);
+            }
+            return true;
+        }else{
+            return false;
+        }
     }
 
     private function execRoute($route, $request, $response){
@@ -111,7 +119,10 @@ class Core{
 
             if(class_exists($controller)){
                 $controllerInstance = new $controller();
-                return $controllerInstance->$method();
+                //Esse abaixo nao consegue passar arrays como parametros
+                //return call_user_func_array([$controllerInstance, $method], $this->params ?? null);
+                //mas esse abaixo sim!
+                 return $controllerInstance->$method($this->params ?? null);
             }
         }
 

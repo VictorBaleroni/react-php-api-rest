@@ -13,6 +13,7 @@ $core = new Core();
 $core->globalMiddlewares([CorsMiddleware::class]);
 
 $core->get('/', 'HomeController@index');
+$core->get('/user', 'UserController@get');
 
 try{
     $core->dispatch($request, $response);

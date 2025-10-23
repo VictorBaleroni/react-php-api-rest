@@ -3,8 +3,8 @@
 use Src\core\Controller;
 
 class UserController extends Controller{
-    public function get($id = null){
-        
+    public function get(){
+        echo 'charma';
     }
 
     public function post(){
