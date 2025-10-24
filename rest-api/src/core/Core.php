@@ -10,6 +10,11 @@ class Core{
     private $groupMiddlewares = [];
     private $groupPrefix = '';
     private $params = [];
+    protected $container;
+
+    public function __construct(){
+        $this->container = new Container();    
+    }
 
     public function globalMiddlewares(array $globalMiddlewares){
         foreach($globalMiddlewares as $middlewares){
@@ -83,7 +88,10 @@ class Core{
         
         if(preg_match($pattern, $path, $matches)){
             if(count($matches) > 1){
-                $this->params = array_slice($matches, 1);
+                preg_match_all('/\{([^}]+)\}/', $route['path'], $nameParams);
+                array_shift($matches);
+                
+                $this->params = array_combine($nameParams[1], $matches);
             }
             return true;
         }else{
@@ -109,7 +117,7 @@ class Core{
 
     private function execHandler($handler, $request, $response){
         if(is_callable($handler)){
-            return $handler($request, $response);
+            return $handler($request, $response, $this->params ?? null);
         }
 
         if(is_string($handler)){
@@ -121,8 +129,10 @@ class Core{
                 $controllerInstance = new $controller();
                 //Esse abaixo nao consegue passar arrays como parametros
                 //return call_user_func_array([$controllerInstance, $method], $this->params ?? null);
-                //mas esse abaixo sim!
-                 return $controllerInstance->$method($this->params ?? null);
+                //Esse abaixo consegue mas nao separa o params direito!
+                //return $controllerInstance->$method($this->params ?? null);
+                //Esse sim!
+                return $this->container->splashParams([$controllerInstance, $method], $this->params);
             }
         }
 

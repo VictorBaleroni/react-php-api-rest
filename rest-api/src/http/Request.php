@@ -7,6 +7,7 @@ class Request{
     public $uri;
     public $headers;
     public $query;
+    public $post;
     public $body;
 
     public function __construct(){
@@ -14,19 +15,18 @@ class Request{
         $this->uri = $_SERVER['REQUEST_URI'] ?? '/';
         $this->headers = getallheaders();
         $this->query = $_GET;
+        $this->post = $this->getPost();
         $this->body = $this->getBody();
     }
 
-    private function getBody(){
+    private function getPost(){
         if ($this->method === 'POST') {
             return $_POST;
         }
+    }
 
-        $input = file_get_contents('php://input');
-        if (strpos($this->headers['Content-Type'] ?? '', 'application/json') !== false) {
-            return json_decode($input, true) ?? [];
-        }
-        return [];
+    private function getBody(){
+            return json_decode(file_get_contents('php://input'), true) ?? [];
     }
 
     public function get($key, $default = null){
@@ -34,6 +34,10 @@ class Request{
     }
     
     public function post($key, $default = null){
+        return $this->post[$key] ?? $default;
+    }
+
+    public function json($key, $default = null){
         return $this->body[$key] ?? $default;
     }
     
