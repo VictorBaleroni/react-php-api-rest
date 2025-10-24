@@ -117,7 +117,7 @@ class Core{
 
     private function execHandler($handler, $request, $response){
         if(is_callable($handler)){
-            return $handler($request, $response, $this->params ?? null);
+            return $this->container->splashParams($handler, $this->params);
         }
 
         if(is_string($handler)){
@@ -129,7 +129,7 @@ class Core{
                 $controllerInstance = new $controller();
                 //Esse abaixo nao consegue passar arrays como parametros
                 //return call_user_func_array([$controllerInstance, $method], $this->params ?? null);
-                //Esse abaixo consegue mas nao separa o params direito!
+                //Esse abaixo consegue mas nao separar os parametros direito!
                 //return $controllerInstance->$method($this->params ?? null);
                 //Esse sim!
                 return $this->container->splashParams([$controllerInstance, $method], $this->params);

@@ -30,14 +30,14 @@ class Container{
                     $args[] = new $className();
                 }
             } else {
-                // print_r($params[$name]);
                 $args[] = $params[$name] ?? null;
             }
         }
 
-        return $reflection->invokeArgs(
-            is_array($callback) ? $callback[0] : null,
-            $args
-        );
+        if(is_array($callback)){
+            return $reflection->invokeArgs($callback[0], $args);
+        }else{
+            return $reflection->invokeArgs($args);
+        }
     }
 }
