@@ -2,10 +2,17 @@
 
 use Src\core\Controller;
 use Src\http\Request;
+use Src\models\Users;
 
 class UserController extends Controller{
     public function get($id = null){
-        echo $id;
+        // $user = new Users();
+        // $user->find($id);
+        $users = Users::all();
+        foreach($users as $value){
+            echo $value->name;
+        }
+        
     }
 
     public function post(){

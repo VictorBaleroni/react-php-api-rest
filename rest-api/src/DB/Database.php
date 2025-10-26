@@ -3,13 +3,13 @@
 namespace Src\DB;
 
 use PDO;
+use Src\http\Response;
 
 class Database{
     protected static $pdo;
 
     public function __construct(){
         loadEnv(dirname(__DIR__, 2).'/.env');
-        
         $host = $_ENV['DB_HOST'];
         $port = $_ENV['DB_PORT'];
         $dbname = $_ENV['DB_NAME'];
@@ -21,11 +21,8 @@ class Database{
             self::$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             self::$pdo->exec('SET NAMES utf8');
         }catch(\PDOException $e){
-            echo json_encode([
-                "success" => "false",
-                "error" => "Erro no banco de dados",
-                "message" => $e->getMessage()
-            ]);
+            Response::status(500);
+            Response::json(['error' => 'Ocorreu um problema ao processar sua solicitação. Por favor, tente novamente mais tarde']);
             die();
         }
     }
@@ -45,12 +42,13 @@ class Database{
 
     public function findById(string $sql, array $params = []){
         $stmt = $this->query($sql, $params);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt->setFetchMode(PDO::FETCH_CLASS, static::class);
+        return $stmt->fetch();
     }
 
     public function findAll(string $sql, array $params = []){
         $stmt = $this->query($sql, $params);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $stmt->fetchAll(PDO::FETCH_CLASS, static::class);
     }
 
     public function insert(string $sql, array $params = []){

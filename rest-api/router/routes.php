@@ -16,7 +16,8 @@ $core->get('/', 'HomeController@index');
 $core->get('/user/{id}', 'UserController@get');
 $core->post('/userpost', 'UserController@post');
 $core->get('/test/{id}', function(Request $request, $id){
-    echo $id;
+    print_r($request->header('Host'));
+    echo '#'.$id;
 });
 
 try{

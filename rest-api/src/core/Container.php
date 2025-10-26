@@ -21,11 +21,11 @@ class Container{
                 if($className === Request::class) {
                     $args[] = new Request();
                 }
-                // elseif(is_subclass_of($className, \App\Core\Model::class)) {
-                //     $id = $params[$name] ?? null;
-                //     print_r($params[$name]);
-                //     $args[] = $className::find($id);
-                // }
+                elseif(is_subclass_of($className, Model::class)) {
+                    $id = $params[$name] ?? null;
+                    print_r($params[$name]);
+                    $args[] = $className::find($id);
+                }
                 else{
                     $args[] = new $className();
                 }
