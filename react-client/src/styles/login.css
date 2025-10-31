@@ -1,0 +1,48 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+body{
+  font-family: "Outfit", sans-serif;
+  font-style: normal;
+  background-color: #5b6262;
+}
+.container-login{
+    display: flex;
+    justify-content: center;
+}
+.form-login{
+    background-color: #03446A;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 5px;
+    border: 1px solid #bbcccc;
+    width: 320px;
+    height: 320px;
+    margin-top: 200px;
+}
+.login-text{
+    color: white;
+    text-align: center;
+}
+.input-email, .input-password{
+    background-color: white;
+    width: 200px;
+    height: 30px;
+    margin: 10px;
+    font-size: 15px;
+    border: #85868a 2px solid;
+    border-radius: 3px;
+}
+.login-button{
+    background-color: #03446A;
+    color: white;
+    width: 210px;
+    height: 35px;
+    margin-top: 30px;
+    border: 2px solid white;
+    font-size: 15px;
+}
+.login-button:hover{
+    background-color: #1c5678;
+    cursor: pointer;
+}

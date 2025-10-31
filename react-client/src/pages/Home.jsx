@@ -1,9 +1,9 @@
+import { Link } from 'react-router-dom';
+import Login from './Login';
+
 const Home = () => {
-    return (
-        <>
-        <h1>aaa</h1>
-        </>
-    )
+    return  <Login />
+      
 }
 
 export default Home
