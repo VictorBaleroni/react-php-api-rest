@@ -6,13 +6,9 @@ use Src\models\Users;
 
 class UserController extends Controller{
     public function get($id = null){
-        // $user = new Users();
-        // $user->find($id);
-        $users = Users::all();
-        foreach($users as $value){
-            echo $value->name;
-        }
+         $search = Users::where('name', 'victor2')->first();
         
+         print_r($search);
     }
 
     public function post(){

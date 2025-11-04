@@ -12,13 +12,15 @@ $core = new Core();
 
 $core->globalMiddlewares([CorsMiddleware::class]);
 
-$core->get('/', 'HomeController@index');
-$core->get('/user/{id}', 'UserController@get');
-$core->post('/userpost', 'UserController@post');
-$core->get('/test/{id}', function(Request $request, $id){
-    print_r($request->header('Host'));
-    echo '#'.$id;
-});
+$core->post('/login', 'AuthController@login');
+
+// $core->get('/', 'HomeController@index');
+// $core->get('/user/{id}', 'UserController@get');
+// $core->post('/userpost', 'UserController@post');
+// $core->get('/test/{id}', function(Request $request, $id){
+//     print_r($request->header('Host'));
+//     echo '#'.$id;
+// });
 
 try{
     $core->dispatch($request, $response);

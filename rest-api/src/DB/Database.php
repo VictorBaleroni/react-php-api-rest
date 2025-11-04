@@ -40,7 +40,7 @@ class Database{
         return $stmt;
     }
 
-    public function findById(string $sql, array $params = []){
+    public function findByKey(string $sql, array $params = []){
         $stmt = $this->query($sql, $params);
         $stmt->setFetchMode(PDO::FETCH_CLASS, static::class);
         return $stmt->fetch();

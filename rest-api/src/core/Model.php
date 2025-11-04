@@ -9,8 +9,11 @@ abstract class Model{
     protected $attributes = [];
     private static $conn;
 
-    public function __construct(){
-        static::$conn = new Database();
+    public function __construct(array $attr = []){
+        self::$conn = new Database();
+        if($attr){
+            $this->fill($attr);
+        }
     }
 
     public function __get($key){
@@ -21,28 +24,43 @@ abstract class Model{
         return $this->attributes[$key] = $value;
     }
 
-    private static function getTable(){
-        return static::$table;
+    private function fill(array $data){
+        foreach ($data as $key => $value) {
+            return $this->attributes[$key] = $value;
+        }
     }
 
     private static function getConn(){
-        if(!static::$conn){
-            static::$conn = new Database();
-            return static::$conn;
+        if(!self::$conn){
+            self::$conn = new Database();
+            return self::$conn;
         }
-        return static::$conn;
+        return self::$conn;
     }
 
     public static function all(){
         self::getConn();
-        $table = self::getTable();
+        $table = static::$table;
         $sql = "SELECT * FROM {$table}";
-        return static::$conn->findAll($sql);
+        return self::$conn->findAll($sql);
     }
 
     public static function find($id){
-        $table = static::getTable();
+        self::getConn();
+        $table = static::$table;
         $sql = "SELECT * FROM {$table} WHERE id = :id";
-        return static::$conn->findById($sql, ['id' => $id]);
+        return self::$conn->findByKey($sql, ['id' => $id]);
+    }
+
+    public static function where($key, $value){
+        return new static(['_where' => [$key, $value]]);
+    }
+
+    public function first(){
+        self::getConn();
+        $table = static::$table;
+        [$col, $value] = $this->attributes['_where'];
+        $sql = "SELECT * FROM {$table} WHERE {$col} = :value LIMIT 1";
+        return self::$conn->findByKey($sql, ['value' => $value]);
     }
 }
