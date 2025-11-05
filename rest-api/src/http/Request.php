@@ -26,7 +26,7 @@ class Request{
     }
 
     private function getBody(){
-            return json_decode(file_get_contents('php://input'), true) ?? [];
+        return json_decode(file_get_contents('php://input'), true) ?? [];
     }
 
     public function get($key, $default = null){

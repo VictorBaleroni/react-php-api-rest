@@ -15,7 +15,8 @@ class UserController extends Controller{
         $request = new Request();
         $email = $request->json('email');
         $pass = $request->json('password');
-        echo json_encode([$email, $pass]);
+
+        echo json_encode(["email" => $email,"password" => $pass]);
     }
     
     public function put($id = null){
